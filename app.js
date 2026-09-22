@@ -2,12 +2,15 @@ const express = require('express')
 const dotenv = require('dotenv')
 const DatabaseSync = require('./src/config/sync')
 
+const providerRoutes = require('./src/routes/provider.routes')
+
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(express.json())
+app.use('/api/providers', providerRoutes)
 
 app.get('/', (req, res) => {
     res.send('server is running successfully')
