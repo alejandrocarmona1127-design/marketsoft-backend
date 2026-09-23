@@ -12,6 +12,7 @@ const UserController = require('../controllers/user.controller')
  *         - name
  *         - email
  *         - password
+ *         - role
  *       properties:
  *         id:
  *           type: integer
@@ -25,11 +26,15 @@ const UserController = require('../controllers/user.controller')
  *         password:
  *           type: string
  *           description: Contraseña del usuario
+ *         role:
+ *           type: string
+ *           description: Rol (admin, user, cashier)
  *       example:
  *         name: Alejandro Carmona
  *         email: alejandrocarmona1127@gmail.com
  *         password: 123456789
- */
+ *         role: admin
+ */         
 
 /**
  * @swagger
