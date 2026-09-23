@@ -1,9 +1,11 @@
-const { Sale, SaleProduct, Product, User } = require('../models/index')
+const Sale = require('../models/sale.model')
+const SaleProduct = require('../models/saleproduct.model')
+const Product = require('../models/product.model')
+const User = require('../models/user.model')
 
 class SaleController {
     static async getAllSales(req, res) {
         try {
-            
             const sales = await Sale.findAll({
                 include: [
                     { model: User, as: 'user', attributes: ['id', 'name', 'email'] },
@@ -35,17 +37,14 @@ class SaleController {
     static async createSale(req, res) {
         try {
             const { userId, products } = req.body
-            
 
             if (!products || products.length === 0) {
                 return res.status(400).json({ message: 'A sale must have at least one product' })
             }
 
-           
             const sale = await Sale.create({ userId, total: 0 })
             let calculatedTotal = 0
 
-           
             for (const item of products) {
                 const product = await Product.findByPk(item.productId)
                 
@@ -54,7 +53,6 @@ class SaleController {
                     const subtotal = price * item.quantity
                     calculatedTotal += subtotal
 
-                    
                     await SaleProduct.create({
                         saleId: sale.id,
                         productId: item.productId,
@@ -62,15 +60,12 @@ class SaleController {
                         price: price 
                     })
 
-                    
                     await product.update({ stock: product.stock - item.quantity })
                 }
             }
 
-            
             await sale.update({ total: calculatedTotal })
 
-            
             const completedSale = await Sale.findByPk(sale.id, {
                 include: [{ model: SaleProduct, as: 'saleProducts' }]
             })
@@ -78,6 +73,19 @@ class SaleController {
             res.status(201).json(completedSale)
         } catch (error) {
             res.status(400).json({ message: 'Error creating sale', error })
+        }
+    }
+
+    static async updateSale(req, res) {
+        try {
+            const { id } = req.params
+            const sale = await Sale.findByPk(id)
+            if (!sale) return res.status(404).json({ message: 'Sale not found' })
+
+            await sale.update(req.body)
+            res.json(sale)
+        } catch (error) {
+            res.status(400).json({ message: 'Error updating sale', error })
         }
     }
 
